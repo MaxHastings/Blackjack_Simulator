@@ -81,6 +81,7 @@ public class Card {
 
     public Card(int type){
         this.type = type;
+        setCardValue();
     }
 
     public int getType() {
@@ -89,6 +90,7 @@ public class Card {
 
     public void setType(int type) {
         this.type = type;
+        setCardValue();
     }
 
     @Override

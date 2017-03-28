@@ -8,15 +8,19 @@ public class Player {
     private static final int HIT = 1;
     private static final int STAY = 0;
 
-    private ArrayList<Card> hand = new ArrayList<>();
+    private double defaultBet = 0;
+
+    private ArrayList<Hand> hands = new ArrayList<>();
+
+    private int id;
 
     private double cash = 0;
-
-    private double bet = 0;
 
     private boolean AI = false;
 
     private int status = HIT;
+
+    private Dealer dealer;
 
     public int getStatus() {
         return status;
@@ -34,41 +38,80 @@ public class Player {
         this.cash = cash;
     }
 
-    public double getBet() {
-        return bet;
-    }
-
-    public void setBet(double bet) {
-        this.bet = bet;
-    }
-
-    public Player(double cash, boolean AI){
+    public Player(int id, Dealer dealer, double cash, boolean AI){
         this.cash = cash;
         this.AI = AI;
+        this.dealer = dealer;
+        this.id = id;
     }
 
-    public void addCard(Card card){
-        hand.add(card);
+    public void hitHand(int i){
+        Card card = dealer.requestCard();
+        hands.get(i).getCards().add(card);
+    }
+
+    public void stayHand(int i){
+        hands.get(i).setStand(true);
+    }
+
+    public void nextMove(){
+        for(int i = 0; i < hands.size(); i++){
+            Hand hand = hands.get(i);
+            while(!hand.isStand()){
+                Main.playerHand(i, hand);
+            }
+        }
+    }
+
+    public double getDefaultBet() {
+        return defaultBet;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setDefaultBet(double defaultBet) {
+        this.defaultBet = defaultBet;
+    }
+
+    public void askForBet(){
+        if(AI){
+
+        }else{
+            defaultBet = Main.enterBet(this);
+            cash -= defaultBet;
+        }
+    }
+
+    public void doubleDown(int i){
+        Hand hand = getHands().get(i);
+        cash -= hand.getBet();
+        hand.setBet(hand.getBet()*2);
+    }
+
+    public void split(int i){
+        Hand hand = hands.remove(i);
+        Card card = hand.getCards().get(1);
+        Hand splitHand = new Hand(this);
+        splitHand.getCards().add(card);
+        hands.add(splitHand);
     }
 
     public void takeCards(){
-        hand.clear();
+        hands.clear();
     }
 
-    public ArrayList<Card> getHand() {
-        return hand;
+    public ArrayList<Hand> getHands() {
+        return hands;
     }
 
-    public void setHand(ArrayList<Card> hand) {
-        this.hand = hand;
+    public void setHands(ArrayList<Hand> hands) {
+        this.hands = hands;
     }
 
-    public int askPlayer(){
-        if(AI){
-            return 1;
-        }else{
-
-        }
-        return 0;
-    }
 }

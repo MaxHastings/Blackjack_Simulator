@@ -35,7 +35,7 @@ public class Deck {
     }
 
     public Card takeTopCard(){
-        if(pos > stack.length){
+        if(pos >= stack.length){
             shuffleStack();
             pos = 0;
         }
