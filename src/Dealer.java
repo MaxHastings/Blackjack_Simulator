@@ -21,10 +21,11 @@ public class Dealer {
         currentPlayers = new ArrayList<>(players);
         for(int i = 0; i < currentPlayers.size(); i++){
             Player player = currentPlayers.get(i);
-            player.askForBet();
+            double bet = player.askForBet();
             Hand hand = new Hand(player);
             hand.getCards().add(deck.takeTopCard());
             hand.getCards().add(deck.takeTopCard());
+            hand.setBet(bet);
             player.getHands().add(hand);
             if(getBestValue(hand) == 21){
                 player.setCash(hand.getBet()*1.5);
@@ -49,6 +50,11 @@ public class Dealer {
         }
     }
 
+    public void handBust(Player player, Hand hand){
+        Main.handLost(hand);
+        player.getHands().remove(hand);
+    }
+
     public void finishGame(){
         while(getBestValue(dealerHand) < 17){
             dealerHand.getCards().add(deck.takeTopCard());
@@ -58,7 +64,7 @@ public class Dealer {
             Player player = players.get(i);
             for (int j = 0; j < player.getHands().size(); j++) {
                 Hand hand = player.getHands().get(i);
-                if(getBestValue(hand) > getBestValue(dealerHand)){
+                if(getBestValue(hand) > getBestValue(dealerHand) || getBestValue(dealerHand) > 21){
                     player.setCash(player.getCash() + hand.getBet()*2);
                     Main.handWon(hand);
                 }else if(getBestValue(hand) == getBestValue(dealerHand)){
@@ -76,12 +82,24 @@ public class Dealer {
         return getDeck().takeTopCard();
     }
 
-    private int getBestValue(Hand hand){
-        int value = 0;
-        for(int i = 0; i < hand.getCards().size(); i++){
-            value += hand.getCards().get(i).getValue1();
+    public int getBestValue(Hand hand){
+        int bestValue = 0;
+        for(int j = 0; j < hand.getCards().size(); j++) {
+            int value = 0;
+            int n = j;
+            for (int i = 0; i < hand.getCards().size(); i++) {
+                if (hand.getCards().get(i).getType() == Card.ACE && n > 0) {
+                    value += hand.getCards().get(i).getValue2();
+                    n--;
+                } else {
+                    value += hand.getCards().get(i).getValue1();
+                }
+            }
+            if(value <= 21 || j == 0) {
+                bestValue = value;
+            }
         }
-        return value;
+        return bestValue;
     }
 
     public Deck getDeck() {

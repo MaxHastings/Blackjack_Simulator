@@ -47,7 +47,11 @@ public class Player {
 
     public void hitHand(int i){
         Card card = dealer.requestCard();
-        hands.get(i).getCards().add(card);
+        Hand hand = hands.get(i);
+        hand.getCards().add(card);
+        if(dealer.getBestValue(hand) > 21){
+            dealer.handBust(this, hand);
+        }
     }
 
     public void stayHand(int i){
@@ -57,8 +61,10 @@ public class Player {
     public void nextMove(){
         for(int i = 0; i < hands.size(); i++){
             Hand hand = hands.get(i);
-            while(!hand.isStand()){
-                Main.playerHand(i, hand);
+            int turn = 0;
+            while(!hand.isStand() && dealer.getBestValue(hand) < 21){
+                Main.playerHand(i, hand, turn);
+                turn++;
             }
         }
     }
@@ -79,13 +85,14 @@ public class Player {
         this.defaultBet = defaultBet;
     }
 
-    public void askForBet(){
+    public double askForBet(){
         if(AI){
 
         }else{
             defaultBet = Main.enterBet(this);
             cash -= defaultBet;
         }
+        return defaultBet;
     }
 
     public void doubleDown(int i){

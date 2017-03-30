@@ -37,7 +37,7 @@ public class Main {
     }
 
 
-    public static void playerHand(int i, Hand hand){
+    public static void playerHand(int i, Hand hand, int turn){
         System.out.println("Player: " + hand.getPlayer().getId() + " Hand: " + i);
         System.out.println("Cards: ");
         for(int j = 0; j < hand.getCards().size(); j++){
@@ -47,17 +47,17 @@ public class Main {
         if(hand.getCards().get(0).getType() == hand.getCards().get(1).getType()){
             //Two cards that are the same. Player can split hand.
             System.out.println("Hit(1) Stand(2) Double Down (3) Split(4)");
-        }else{
-
+        }else if(turn < 1){
+            System.out.println("Hit(1) Stand(2) Double Down(3)");
+        }else {
+            System.out.println("Hit(1) Stand(2)");
         }
-        System.out.println("Hit(1) Stand(2) Double Down(3)");
         Scanner sc = new Scanner(System.in);
         int command = sc.nextInt();
         if(command == 1){
             hand.getPlayer().hitHand(i);
         }else if(command == 2){
             hand.setStand(true);
-            return;
         }else if(command == 3){
             hand.getPlayer().doubleDown(i);
         }else{
@@ -67,7 +67,6 @@ public class Main {
                 System.out.println("Invalid Command");
             }
         }
-        playerHand(i, hand);
     }
 
     public static double enterBet(Player player){
