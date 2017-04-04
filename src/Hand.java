@@ -13,6 +13,20 @@ public class Hand {
 
     private Player player;
 
+    private int turn = 0;
+
+    public int getTurn() {
+        return turn;
+    }
+
+    public void setTurn(int turn) {
+        this.turn = turn;
+    }
+
+    public void increaseTurn(){
+        turn++;
+    }
+
     public Player getPlayer() {
         return player;
     }

@@ -50,23 +50,31 @@ public class Player {
         Hand hand = hands.get(i);
         hand.getCards().add(card);
         if(dealer.getBestValue(hand) > 21){
-            dealer.handBust(this, hand);
+            dealer.handBust(hand);
         }
+    }
+
+    public void addCash(double amount){
+        this.cash += amount;
     }
 
     public void stayHand(int i){
         hands.get(i).setStand(true);
     }
 
-    public void nextMove(){
-        for(int i = 0; i < hands.size(); i++){
-            Hand hand = hands.get(i);
-            int turn = 0;
-            while(!hand.isStand() && dealer.getBestValue(hand) < 21){
-                Main.playerHand(i, hand, turn);
-                turn++;
-            }
+    public void nextMove(int i, Hand hand){
+        Main.playerHand(i, hand);
+    }
+
+    public String getPlayerHandString(int x){
+        String handString = "";
+        Hand hand = getHands().get(x);
+        handString += "Player: " + hand.getPlayer().getId() + " Hand: " + x + "\n Cards: \n";
+        for(int j = 0; j < hand.getCards().size(); j++){
+            handString += hand.getCards().get(j).toString() + " | ";
         }
+        handString += "\n";
+        return handString;
     }
 
     public double getDefaultBet() {

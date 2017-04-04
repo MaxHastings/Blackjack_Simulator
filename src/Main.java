@@ -36,18 +36,16 @@ public class Main {
         System.out.print("\n");
     }
 
+    public static void showPlayerHand(Player player, int handNum){
+        System.out.print(player.getPlayerHandString(handNum));
+    }
 
-    public static void playerHand(int i, Hand hand, int turn){
-        System.out.println("Player: " + hand.getPlayer().getId() + " Hand: " + i);
-        System.out.println("Cards: ");
-        for(int j = 0; j < hand.getCards().size(); j++){
-            System.out.print(hand.getCards().get(j).toString() + " | ");
-        }
-        System.out.print("\n");
+
+    public static void playerHand(int i, Hand hand){
         if(hand.getCards().get(0).getType() == hand.getCards().get(1).getType()){
             //Two cards that are the same. Player can split hand.
             System.out.println("Hit(1) Stand(2) Double Down (3) Split(4)");
-        }else if(turn < 1){
+        }else if(hand.getTurn() < 1){
             System.out.println("Hit(1) Stand(2) Double Down(3)");
         }else {
             System.out.println("Hit(1) Stand(2)");

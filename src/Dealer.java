@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Maxwell on 3/26/2017.
@@ -26,10 +27,10 @@ public class Dealer {
             hand.getCards().add(deck.takeTopCard());
             hand.getCards().add(deck.takeTopCard());
             hand.setBet(bet);
-            player.getHands().add(hand);
             if(getBestValue(hand) == 21){
-                player.setCash(hand.getBet()*1.5);
-                takeCards(player);
+                blackJack(hand);
+            }else {
+                player.getHands().add(hand);
             }
         }
         dealerHand.getCards().clear();
@@ -39,39 +40,77 @@ public class Dealer {
         finishGame();
     }
 
-    public void takeCards(Player player){
-        player.takeCards();
-        currentPlayers.remove(player);
+    public boolean isBust(Hand hand){
+        return getBestValue(hand) > 21;
+    }
+
+    public boolean is21(Hand hand){
+        return getBestValue(hand) == 21;
+    }
+
+    public void handWon(Hand hand){
+        hand.getPlayer().addCash(hand.getBet()*2);
+        Main.handWon(hand);
+    }
+
+    public void blackJack(Hand hand){
+        hand.getPlayer().addCash(hand.getBet() * 3/2);
+    }
+
+    public void handLost(Hand hand){
+        Main.handLost(hand);
     }
 
     public void askPlayers(){
         for(int i = 0; i < players.size(); i++){
-            players.get(i).nextMove();
+            Player player = players.get(i);
+            ArrayList<Hand> hands = player.getHands();
+            for(int j = 0; j < hands.size(); j++){
+                Hand hand = hands.get(j);
+                while(true){
+                    Main.showPlayerHand(player, j);
+                    if(isBust(hand)){
+                        handLost(hand);
+                        return;
+                    }else if(is21(hand)) {
+                        handWon(hand);
+                        return;
+                    }else if(hand.isStand()){
+                        return;
+                    }else{
+                        player.nextMove(j, hand);
+                        hand.increaseTurn();
+                    }
+                }
+            }
         }
     }
 
-    public void handBust(Player player, Hand hand){
+    public void handBust(Hand hand){
         Main.handLost(hand);
-        player.getHands().remove(hand);
+        hand.getPlayer().getHands().remove(hand);
+    }
+
+    public void handTied(Hand hand){
+        hand.getPlayer().addCash(hand.getBet());
+        Main.handTied(hand);
     }
 
     public void finishGame(){
         while(getBestValue(dealerHand) < 17){
             dealerHand.getCards().add(deck.takeTopCard());
+            Main.showDealerHand(dealerHand);
         }
-        Main.showDealerHand(dealerHand);
         for(int i = 0; i < players.size(); i++) {
             Player player = players.get(i);
             for (int j = 0; j < player.getHands().size(); j++) {
                 Hand hand = player.getHands().get(i);
                 if(getBestValue(hand) > getBestValue(dealerHand) || getBestValue(dealerHand) > 21){
-                    player.setCash(player.getCash() + hand.getBet()*2);
-                    Main.handWon(hand);
+                    handWon(hand);
                 }else if(getBestValue(hand) == getBestValue(dealerHand)){
-                    player.setCash(player.getCash() + hand.getBet());
-                    Main.handTied(hand);
+                    handTied(hand);
                 }else{
-                    Main.handLost(hand);
+                    handLost(hand);
                 }
                 player.getHands().remove(j);
             }
